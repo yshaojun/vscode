@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>browser-amd-editor</title>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	</head>
+	<body>
+		<h2>Monaco Editor Sample</h2>
+		<div id="container" style="width: 800px; height: 600px; border: 1px solid grey"></div>
+
+		<!-- OR ANY OTHER AMD LOADER HERE INSTEAD OF loader.js -->
+		<script src="./out/vs/loader.js"></script>
+		<script>
+			require.config({ paths: { vs: './out/vs' } });
+
+			require(['vs/editor/editor.main'], function () {
+// ---------
+
+const originalModel = monaco.editor.createModel(
+	/* set from `originalModel`: */ ``,
+	"text/plain"
+);
+const modifiedModel = monaco.editor.createModel(
+	/* set from `modifiedModel`: */ `#!/usr/bin/env bash
+
+set -e
+
+if [[ "\$OSTYPE" == "darwin"* ]]; then
+	realpath() { [[ \$1 = /* ]] && echo "\$1" || echo "\$PWD/\${1#./}"; }
+	ROOT=\$(dirname "\$(dirname "\$(realpath "\$0")")")
+else
+	ROOT=\$(dirname "\$(dirname "\$(readlink -f \$0)")")
+fi
+
+cd "\$ROOT"
+exec node dist/simulationMain.js "\$@"
+
+exit \$?
+`,
+	"text/plain"
+);
+
+const diffEditor = monaco.editor.createDiffEditor(
+	document.getElementById("container"),
+	{
+		originalEditable: true,
+		automaticLayout: true,
+		diffAlgorithm: 'advanced',
+		ignoreTrimWhitespace: false,
+		experimental: {
+			useVersion2: true,
+		}
+	}
+);
+diffEditor.setModel({
+	original: originalModel,
+	modified: modifiedModel,
+});
+
+// ---------
+			});
+		</script>
+	</body>
+</html>
